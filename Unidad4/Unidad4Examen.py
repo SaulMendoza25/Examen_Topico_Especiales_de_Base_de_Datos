@@ -8,7 +8,9 @@ from tensorflow.keras.optimizers import RMSprop
 from tensorflow.keras.losses import CategoricalCrossentropy
 from tensorflow.keras.metrics import Accuracy
 from tensorflow.keras import models
+from tensorflow.keras import regularizers
 from tensorflow.keras import layers
+from tensorflow.keras import callbacks
 mnist = oml.datasets.get_dataset(40996)
 X, y, _, _ = mnist.get_data(target=mnist.default_target_attribute, dataset_format='array');
 X = X.reshape(70000, 28, 28)
@@ -36,17 +38,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=60000, rand
 
 Xf_train, x_val, yf_train, y_val = train_test_split(X_train, y_train, train_size=50000, shuffle=True, stratify=y_train, random_state=0)
 
-# print(X.shape, y.shape)
-
-# No ejecutar
-#     “no ejecutar”
-# tf.keras.layers.Dense(
-#     units, activation=None, use_bias=True, kernel_initializer='glorot_uniform',
-#     bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None,
-#     activity_regularizer=None, kernel_constraint=None, bias_constraint=None,
-#     **kwargs
-# )
-
+print(X.shape, y.shape)
 
 
 model = models.Sequential()
@@ -116,8 +108,8 @@ from IPython.display import clear_output
 # For plotting the learning curve in real time
 class TrainingPlot(keras.callbacks.Callback):
     
-    # This function is called when the training begins
-    def on_train_begin(self, logs={}):
+
+ def on_train_begin(self, logs={}):
         # Initialize the lists for holding the logs, losses and accuracies
         self.losses = []
         self.acc = []
@@ -127,33 +119,33 @@ class TrainingPlot(keras.callbacks.Callback):
         self.max_acc = 0
     
     # This function is called at the end of each epoch
-    def on_epoch_end(self, epoch, logs={}):
+ def on_epoch_end(self, epoch, logs={}):
         
-        # Append the logs, losses and accuracies to the lists
-        self.logs.append(logs)
-        self.losses.append(logs.get('loss'))
-        self.acc.append(logs.get('accuracy'))
-        self.val_losses.append(logs.get('val_loss'))
-        self.val_acc.append(logs.get('val_accuracy'))
-        self.max_acc = max(self.max_acc, logs.get('val_accuracy'))
+    # Append the logs, losses and accuracies to the lists
+    self.logs.append(logs)
+    self.losses.append(logs.get('loss'))
+    self.acc.append(logs.get('accuracy'))
+    self.val_losses.append(logs.get('val_loss'))
+    self.val_acc.append(logs.get('val_accuracy'))
+    self.max_acc = max(self.max_acc, logs.get('val_accuracy'))
         
-        # Before plotting ensure at least 2 epochs have passed
-        if len(self.losses) > 1:
+    # Before plotting ensure at least 2 epochs have passed
+    if len(self.losses) > 1:
                 
-                # Clear the previous plot
-            clear_output(wait=True)
-            N = np.arange(0, len(self.losses))
-                
-                # Plot train loss, train acc, val loss and val acc against epochs passed
-            plt.figure(figsize=(8,3))
-            plt.plot(N, self.losses, lw=2, c="b", linestyle="-", label = "train_loss")
-            plt.plot(N, self.acc, lw=2, c="r", linestyle="-", label = "train_acc")
-            plt.plot(N, self.val_losses, lw=2, c="b", linestyle=":", label = "val_loss")
-            plt.plot(N, self.val_acc, lw=2, c="r", linestyle=":", label = "val_acc")
-            plt.title("Training Loss and Accuracy [Epoch {}, Max Acc {:.4f}]".format(epoch, self.max_acc))
-            plt.xlabel("Epoch #")
-            plt.ylabel("Loss/Accuracy")
-            plt.legend()
+        # Clear the previous plot
+        clear_output(wait=True)
+        N = np.arange(0, len(self.losses))
+            
+        # Plot train loss, train acc, val loss and val acc against epochs passed
+        plt.figure(figsize=(8,3))
+        plt.plot(N, self.losses, lw=2, c="b", linestyle="-", label = "train_loss")
+        plt.plot(N, self.acc, lw=2, c="r", linestyle="-", label = "train_acc")
+        plt.plot(N, self.val_losses, lw=2, c="b", linestyle=":", label = "val_loss")
+        plt.plot(N, self.val_acc, lw=2, c="r", linestyle=":", label = "val_acc")
+        plt.title("Training Loss and Accuracy [Epoch {}, Max Acc {:.4f}]".format(epoch, self.max_acc))
+        plt.xlabel("Epoch #")
+        plt.ylabel("Loss/Accuracy")
+        plt.legend()
 
 # from sklearn.model_selection import train_test_split
 
@@ -161,13 +153,13 @@ plot_losses = TrainingPlot()
 # model = create_model()
 # history = model.fit(Xf_train, yf_train, epochs=25, batch_size=512, verbose=0,
 #                     validation_data=(x_val, y_val), callbacks=[plot_losses])
-from tensorflow.keras import callbacks
+
 # 
 # earlystop = callbacks.EarlyStopping(monitor='val_loss', patience=3)
 # model = create_model()
 # history = model.fit(Xf_train, yf_train, epochs=25, batch_size=512, verbose=0,
 # validation_data=(x_val, y_val), callbacks=[plot_losses, earlystop])
-from tensorflow.keras import regularizers
+
 
 earlystop = callbacks.EarlyStopping(monitor='val_loss', patience=5)
 model = create_model()
@@ -214,6 +206,13 @@ plot_losses = TrainingPlot()
 history = network.fit(Xf_train, yf_train, epochs=50, batch_size=512, verbose=0,
                       validation_data=(x_val, y_val), callbacks=[plot_losses, earlystop])
 
+# No ejecutar
+# tf.keras.layers.Dense(
+    # units, activation=None, use_bias=True, kernel_initializer='glorot_uniform',
+    # bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None,
+    # activity_regularizer=None, kernel_constraint=None, bias_constraint=None,
+    # **kwargs
+# )
 plt.show()
 # plt.show()
 
